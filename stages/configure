@@ -20,11 +20,15 @@ NVIDIABUSID=$(lspci -d 10de: -n | grep '030[02]:' | cut -d' ' -f1 | tr . :)
 
 re_busid='^( *BusID +")[^"]*'
 
-if [ -f "${CONFDIR}/xorg.conf.$DRIVER" ]; then
-    echo "Setting Bus ID in xorg.conf.$DRIVER if needed..."
-    sed -E -i "${CONFDIR}/xorg.conf.$DRIVER" \
+# Currently, only the nvidia conffile needs the PCI Bus ID set. Nouveau doesn't
+# need it but setting it is needed in some cards.
+for driver in "${DRIVERS[@]}"; do
+    if [ -f "${CONFDIR}/xorg.conf.$driver" ]; then
+        echo "Setting Bus ID in xorg.conf.$driver..."
+        sed -E -i "${CONFDIR}/xorg.conf.$driver" \
         -e "s,${re_busid},\1$NVIDIABUSID,"
-fi
+    fi
+done
 
 # add the bumblebee group
 if getent group bumblebee >/dev/null; then

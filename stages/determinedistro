@@ -9,9 +9,14 @@ elif grep -iq "Arch Linux" /etc/issue; then
 elif grep -iq Fedora /etc/issue; then
     DISTRO=fedora
     echo "You are running Fedora, the work is in progress for you distro but not"
-    echo "sufficient. If you would like to help to port the installer to fedora,"
-    echo "please visit https://github.com/Bumblebee-Project/Bumblebee/issues"
-    exit 3
+    echo "sufficient. This is the develeopment version with initial Fedora support."
+    echo "Please only go further if you no what you are doing."
+    echo "Please visit https://github.com/Bumblebee-Project/Bumblebee/issues"
+    read -p "Would you like to continue ? (y / n) " answer
+    if [[ $answer != [yY]* ]]; then
+        echo "Installation aborted"
+        exit 3
+    fi
 elif grep -iq OpenSUSE /etc/issue; then
     DISTRO=opensuse
     echo "You are running openSUSE, the work is in progress for you distro but not"

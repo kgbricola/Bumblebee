@@ -11,6 +11,29 @@ for package in "${dependencies[@]}"; do
     fi
 done
 
+for driver in "${DRIVERS[@]}"; do
+    case "$driver" in
+      nvidia)
+        for i in xorg-x11-drv-nvidia-bumblebee
+        do
+            dependencies[${#dependencies[@]}]="$i"
+        done
+        ;;
+      nouveau)
+        for i in xorg-x11-drv-nouveau
+        do
+            dependencies[${#dependencies[@]}]="$i"
+        done
+        ;;
+    esac
+done
+
+for package in "${dependencies[@]}"; do
+    if ! rpm -q "$package" &>/dev/null; then
+        missing_dependencies[${#missing_dependencies}]="$package"
+    fi
+done
+
 failed=false
 # detect if cleanup is needed
 if [ -f /etc/bumblebee ]; then
@@ -31,12 +54,15 @@ if [ ${#missing_dependencies} -gt 0 ]; then
     echo "And installed by running:"
     echo "    sudo yum install <path to retrieved rpm>"
     echo
+    echo "xorg-x11-drv-nvidia-bumblebee can be retrieved from:"
+    echo "    url ..."
+    echo "And installed by running:"
+    echo "    sudo yum install <path to retrieved rpm> --nogpgcheck"
+    echo
     echo "Update your package lists and install the dependencies by running:"
     echo "    sudo yum update"
     echo "    sudo yum install ${missing_dependencies[*]}"
     failed=true
 fi
-
-# TODO: Check if the nvidia stuff is installed
 
 $failed && exit 4
